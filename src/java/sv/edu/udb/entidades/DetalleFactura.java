@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,7 +33,7 @@ public class DetalleFactura implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID_DETALLE_FACTURA")
     private Integer idDetalleFactura;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
@@ -41,6 +43,8 @@ public class DetalleFactura implements Serializable {
     private Integer cantidad;
     @Column(name = "IVA")
     private BigDecimal iva;
+    @Column(name = "TOTAL")
+    private BigDecimal total;
     @JoinColumn(name = "ID_FACTURA", referencedColumnName = "ID_FACTURA")
     @ManyToOne
     private Factura idFactura;
@@ -87,6 +91,16 @@ public class DetalleFactura implements Serializable {
         this.iva = iva;
     }
 
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    
+    
     public Factura getIdFactura() {
         return idFactura;
     }

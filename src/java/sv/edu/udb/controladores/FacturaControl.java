@@ -1,6 +1,8 @@
 package sv.edu.udb.controladores;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,48 +23,57 @@ import sv.edu.udb.modelo.ProductoFacade;
 
 @ManagedBean
 @SessionScoped
-public class FacturaControl implements Serializable{
+public class FacturaControl implements Serializable {
 
     @EJB
     EmpleadoFacade empleadoFacade;
-    
+
     @EJB
     ClienteFacade clienteFacade;
-    
+
     @EJB
     FormaPagoFacade formaPagoFacade;
-    
+
     @EJB
     ProductoFacade productoFacade;
-    
+
     private Factura factura;
     private List<Empleado> lstEmpleado;
     private List<Cliente> lstCliente;
     private List<FormaPago> lstFormaPago;
     private List<Producto> lstProducto;
-    
-    
+    private DetalleFactura detalleFactura;
+
     @PostConstruct
     public void init() {
-            factura = new Factura();
-            factura.setFecha(new Date());
-            factura.setDetalleFacturaList(new ArrayList<DetalleFactura>());
-            listarEmpleados();
-            listarClientes();
-            listarFormaPago();
-            listarProductos();
+        factura = new Factura();
+        factura.setFecha(new Date());
+        factura.setDetalleFacturaList(new ArrayList<DetalleFactura>());
+        listarEmpleados();
+        listarClientes();
+        listarFormaPago();
+        listarProductos();
+        detalleFactura = new DetalleFactura();
+    }
+
+    public void calcularTotales() {
+        if ((detalleFactura.getCantidad() != null) && (detalleFactura.getIdProducto().getPrecio() !=null)) {
+            BigDecimal subtotal = detalleFactura.getIdProducto().getPrecio().multiply(new BigDecimal(detalleFactura.getCantidad()));
+            detalleFactura.setIva(subtotal.multiply(new BigDecimal(0.13).setScale(2, RoundingMode.UP)));
+            detalleFactura.setTotal(subtotal.subtract(detalleFactura.getIva()).setScale(2, RoundingMode.UP));
+        }
     }
 
     public List<Empleado> listarEmpleados() {
         lstEmpleado = empleadoFacade.findAll();
         return lstEmpleado;
     }
-    
+
     public List<Cliente> listarClientes() {
         lstCliente = clienteFacade.findAll();
         return lstCliente;
-    }   
-    
+    }
+
     public List<FormaPago> listarFormaPago() {
         lstFormaPago = formaPagoFacade.findAll();
         return lstFormaPago;
@@ -72,7 +83,7 @@ public class FacturaControl implements Serializable{
         lstProducto = productoFacade.findAll();
         return lstProducto;
     }
-    
+
     public Factura getFactura() {
         return factura;
     }
@@ -112,6 +123,13 @@ public class FacturaControl implements Serializable{
     public void setLstProducto(List<Producto> lstProducto) {
         this.lstProducto = lstProducto;
     }
-    
-    
+
+    public DetalleFactura getDetalleFactura() {
+        return detalleFactura;
+    }
+
+    public void setDetalleFactura(DetalleFactura detalleFactura) {
+        this.detalleFactura = detalleFactura;
+    }
+
 }

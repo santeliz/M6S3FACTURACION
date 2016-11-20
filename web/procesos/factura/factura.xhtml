@@ -22,14 +22,61 @@
                             <p:outputLabel value="#{facturaControl.factura.fecha}" >
                                 <f:convertDateTime pattern="dd/MM/yyyy" locale="ES_SV" />
                             </p:outputLabel>
-                            
+
                             <p:outputLabel value="Empleado: " />
                             <p:inputText readonly="true" value="#{facturaControl.factura.idEmpleado.nombre}" />
                             <p:commandButton icon='ui-icon-person' oncomplete="PF('dlgEmpleado').show()" />
+
+                            <p:outputLabel value="Cliente: " />
+                            <p:selectOneMenu id="cliente" value="#{facturaControl.factura.idCliente}" 
+                                             converter="entityConverter" effect="fade" var="cliente" filter="true"
+                                             filterMatchMode="contains"  style="width:200px">
+                                <f:selectItems value="#{facturaControl.lstCliente}" var="cliente" itemLabel="#{cliente.nombre} - #{cliente.direccion}" itemValue="#{cliente}" />
+                                <p:column>
+                                    <h:outputText value="#{cliente.nombre}" />
+                                </p:column>
+                                <p:column>
+                                    <h:outputText value="#{cliente.direccion}" />
+                                </p:column>                                
+                            </p:selectOneMenu>                            
+
+                            <p:outputLabel value="Forma de Pago:  " />
+                            <p:selectOneMenu id="formaPago" value="#{facturaControl.factura.idFormaPago}" 
+                                             converter="entityConverter" effect="fade" var="forma" filter="true"
+                                             filterMatchMode="contains"  style="width:160px">
+                                <f:selectItems value="#{facturaControl.lstFormaPago}" var="forma" 
+                                               itemLabel="#{forma.descripcion}" itemValue="#{forma}" />
+                                <p:column>
+                                    <h:outputText value="#{forma.descripcion}" />
+                                </p:column>                              
+                            </p:selectOneMenu>                             
+                            
+                            <h:panelGroup />
+                            <p:outputLabel value="Producto:  " />
+                            <p:selectOneMenu id="producto" value="#{facturaControl.detalleFactura.idProducto}" 
+                                             converter="entityConverter" effect="fade" var="prod" filter="true"
+                                             filterMatchMode="contains"  style="width:160px" >
+                                <f:selectItems value="#{facturaControl.lstProducto}" var="prod" 
+                                               itemLabel="#{prod.descripcion}" itemValue="#{prod}" />
+                                <p:column>
+                                    <h:outputText value="#{prod.descripcion}" />
+                                </p:column>  
+                                <p:ajax event="change" process="@this cantidad" update="precio total" listener="#{facturaControl.calcularTotales()}"/>
+                            </p:selectOneMenu>                                
+                            
+                            <p:outputLabel value="Precio:  " />
+                            <p:inputText id="precio" readonly="true" value="#{facturaControl.detalleFactura.idProducto.precio}" />
+                            <h:panelGroup />
+                            
+                            <p:outputLabel value="Cantidad:  " />
+                            <p:inputText id="cantidad" value="#{facturaControl.detalleFactura.cantidad}" />
+                            
+                            <p:outputLabel value="Total:  " />
+                            <p:inputText id="total" disabled="true" value="#{facturaControl.detalleFactura.total}" />                            
                         </p:panelGrid>
                     </p:panel>
                 </h:form>
-                
+
                 <h:form id="frmEmpleado">
                     <p:dialog modal="true" widgetVar="dlgEmpleado" position="top">
                         <p:dataTable value="#{facturaControl.lstEmpleado}" var="empleado">
@@ -45,14 +92,14 @@
                                                  update="frmPrincipal">
                                     <f:setPropertyActionListener value="#{empleado}" 
                                                                  target="#{facturaControl.factura.idEmpleado}" />
-                                    
+
                                 </p:commandButton>
                             </p:column>
                         </p:dataTable>
                     </p:dialog>
                 </h:form>
-                
-                
+
+
             </ui:define>
 
             <ui:define name="bottom">
