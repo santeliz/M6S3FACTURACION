@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./../../plantilla/plantilla.xhtml">
+
+            <ui:define name="top">
+                <h2>Factura Comercial</h2>
+            </ui:define>
+
+            <ui:define name="content">
+                <h:form id="frmPrincipal">
+                    <p:panel id="pnlFactura" >
+                        <p:panelGrid columns="5">
+                            <p:outputLabel value="Fecha" />
+                            <p:outputLabel value="#{facturaControl.factura.fecha}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" locale="ES_SV" />
+                            </p:outputLabel>
+                            
+                            <p:outputLabel value="Empleado: " />
+                            <p:inputText readonly="true" value="#{facturaControl.factura.idEmpleado.nombre}" />
+                            <p:commandButton icon='ui-icon-person' oncomplete="PF('dlgEmpleado').show()" />
+                        </p:panelGrid>
+                    </p:panel>
+                </h:form>
+                
+                <h:form id="frmEmpleado">
+                    <p:dialog modal="true" widgetVar="dlgEmpleado" position="top">
+                        <p:dataTable value="#{facturaControl.lstEmpleado}" var="empleado">
+                            <p:column headerText="Código">
+                                <p:outputLabel value="#{empleado.idEmpleado}" />
+                            </p:column>
+                            <p:column headerText="Nombre">
+                                <p:outputLabel value="#{empleado.nombre}" />
+                            </p:column>
+                            <p:column>
+                                <p:commandButton value="Seleccionar" 
+                                                 oncomplete="PF('dlgEmpleado').hide()" 
+                                                 update="frmPrincipal">
+                                    <f:setPropertyActionListener value="#{empleado}" 
+                                                                 target="#{facturaControl.factura.idEmpleado}" />
+                                    
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:dialog>
+                </h:form>
+                
+                
+            </ui:define>
+
+            <ui:define name="bottom">
+                bottom
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
