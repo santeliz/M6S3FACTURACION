@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <body>
+
+        <ui:composition template="./../../plantilla/plantilla.xhtml">
+
+            <ui:define name="top">
+                <h2>Lista de Facturas Comerciales</h2>
+            </ui:define>
+
+            <ui:define name="content">
+                <h:form id="frmFacturasLista">
+                    <p:growl id="mensaje" />
+                    <p:panel id="pnlFactura" >
+                        <p:commandButton icon="ui-icon-plus" action="#{facturaControl.agregarFactura()}" />
+                        <f:facet name="headerText">
+                            <h:outputText value="LISTADO DE FACTURAS" />
+                        </f:facet>
+                        <p:dataTable id="dtFactura" value="#{facturaListar.facturaLst}" var="factura" 
+                                     rows="10"
+                                     paginator="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15">                                     
+
+                            <p:column headerText="FACTURA">
+                                <h:outputText value="#{factura.idFactura}" />
+                            </p:column>                            
+
+                            <p:column headerText="CLIENTE">
+                                <h:outputText value="#{factura.idCliente.idCliente} - #{factura.idCliente.nombre}" />
+                            </p:column>                            
+
+                            <p:column headerText="EMPLEADO">
+                                <h:outputText value="#{factura.idEmpleado.idEmpleado} - #{factura.idEmpleado.nombre}" />
+                            </p:column>                            
+
+                            <p:column headerText="FORMA DE PAGO">
+                                <h:outputText value="#{factura.idFormaPago.idFormaPago} - #{factura.idFormaPago.descripcion}" />
+                            </p:column>                               
+
+                            <p:column headerText="FECHA">
+                                <h:outputText value="#{factura.fecha}" />
+                            </p:column>    
+
+                            <p:column style="width:32px;text-align: center">
+                                <p:commandButton icon="ui-icon-plus" action="#{facturaControl.agregarFactura()}" />
+                            </p:column>
+                            
+                            <p:column style="width:32px;text-align: center">
+                                <p:commandButton icon="ui-icon-pencil" action="factura.xhtml?faces-redirect=true">
+                                    <f:setPropertyActionListener value="#{factura}" target="#{facturaControl.factura}" />
+                                </p:commandButton>
+                            </p:column>
+                            
+                            <p:column style="width:32px;text-align: center">                                
+                                <p:commandButton icon="ui-icon-trash" 
+                                                 action="#{facturaListar.borrarFactura()}" 
+                                                 update=":frmFacturasLista:pnlFactura :frmFacturasLista:mensaje">
+                                    <f:setPropertyActionListener value="#{factura}" target="#{facturaListar.facturaSelected}" />
+                                </p:commandButton>                                
+                            </p:column>
+
+                            
+                        </p:dataTable>
+
+                    </p:panel>
+                </h:form>
+
+            </ui:define>
+
+            <ui:define name="bottom">
+                bottom
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>

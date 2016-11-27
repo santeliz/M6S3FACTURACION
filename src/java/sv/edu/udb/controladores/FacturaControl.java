@@ -8,8 +8,10 @@ import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.FacesContext;
 import sv.edu.udb.entidades.Cliente;
 import sv.edu.udb.entidades.DetalleFactura;
 import sv.edu.udb.entidades.Empleado;
@@ -18,6 +20,7 @@ import sv.edu.udb.entidades.FormaPago;
 import sv.edu.udb.entidades.Producto;
 import sv.edu.udb.modelo.ClienteFacade;
 import sv.edu.udb.modelo.EmpleadoFacade;
+import sv.edu.udb.modelo.FacturaFacade;
 import sv.edu.udb.modelo.FormaPagoFacade;
 import sv.edu.udb.modelo.ProductoFacade;
 
@@ -36,6 +39,9 @@ public class FacturaControl implements Serializable {
 
     @EJB
     ProductoFacade productoFacade;
+    
+    @EJB
+    FacturaFacade facturaFacade;
 
     private Factura factura;
     private List<Empleado> lstEmpleado;
@@ -59,11 +65,48 @@ public class FacturaControl implements Serializable {
     public void calcularTotales() {
         if ((detalleFactura.getCantidad() != null) && (detalleFactura.getIdProducto().getPrecio() !=null)) {
             BigDecimal subtotal = detalleFactura.getIdProducto().getPrecio().multiply(new BigDecimal(detalleFactura.getCantidad()));
+//            subtotal = subtotal.set
             detalleFactura.setIva(subtotal.multiply(new BigDecimal(0.13).setScale(2, RoundingMode.UP)));
             detalleFactura.setTotal(subtotal.subtract(detalleFactura.getIva()).setScale(2, RoundingMode.UP));
         }
     }
 
+    
+    public String agregarFactura() {
+        factura = new Factura();
+        factura.setFecha(new Date());
+        factura.setDetalleFacturaList(new ArrayList<DetalleFactura>());
+        detalleFactura = new DetalleFactura();
+        return "factura.xhtml?faces-redirect=true";
+    }
+    
+    public String agregarDetalle() {
+    
+        try {
+            detalleFactura.setPrecio(detalleFactura.getIdProducto().getPrecio());
+            detalleFactura.setIdFactura(factura);
+            factura.getDetalleFacturaList().add(detalleFactura);
+            factura = facturaFacade.edit(factura);
+            detalleFactura = new DetalleFactura();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos Guardados", "Se agregó el producto correspondiente."));
+        } catch (Exception e) {
+            System.out.println("ERROR al agregar el detalle " + e);
+        }
+        return "factura.xhtml?faces-redirect=true";
+    }
+    
+        public String borrarDetalle() {
+    
+        try {
+            factura.getDetalleFacturaList().remove(detalleFactura);
+            factura = facturaFacade.edit(factura);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Datos Borrado", "Se borro el producto correspondiente."));
+        } catch (Exception e) {
+            System.out.println("ERROR al borrar el detalle " + e);
+        }
+        return "factura.xhtml?faces-redirect=true";
+    }
+    
     public List<Empleado> listarEmpleados() {
         lstEmpleado = empleadoFacade.findAll();
         return lstEmpleado;
